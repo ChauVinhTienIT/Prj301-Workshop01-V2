@@ -47,7 +47,7 @@
                             <tr>
                                 <td>${product.getProductId()}</td>
                                 <td>${product.getProductName()}</td>
-                                <td><img scr="" width="50" height="50"></td>
+                                <td><img src=".${product.getProductImage()}" width="100" height="100"></td>
                                 <td>${product.getBrief()}</td>
                                 <td>${product.getPostedDate()}</td>
                                 <td>${product.getTypeId()}</td>
