@@ -39,6 +39,10 @@ public class AccountDao implements Accessible<Account> {
                                                + "SET lastName = ?, firstName = ?, birthday = ?, gender = ?, phone = ?, isUse = ?, roleInSystem = ? "
                                                + "WHERE account = ?";
     
+    private static final String UPDATE_STATUS = "UPDATE accounts "
+                                               + "SET isUse = ? "
+                                               + "WHERE account = ?";
+    
     private static final String ACCOUNT = "account";
     private static final String PASS = "pass";
     private static final String LAST_NAME = "lastName";
@@ -236,6 +240,24 @@ public class AccountDao implements Accessible<Account> {
         disConnect();
         
         return acc;
+    }
+    
+    public int changeAccountStatus(Account obj) throws SQLException{
+        int result = 0;
+        obj.setIsUse(!obj.isIsUse());
+        try {
+            connection = getConnect();
+            ps = connection.prepareStatement(UPDATE_STATUS);
+            ps.setBoolean(1, obj.isIsUse());
+            ps.setString(2, obj.getAccount());
+            result = ps.executeUpdate();
+      
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        disConnect();
+        return result;
     }
     
     private void makeConnection() throws ClassNotFoundException, SQLException{

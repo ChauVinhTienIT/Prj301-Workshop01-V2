@@ -24,11 +24,17 @@ import model.Category;
 public class CategoryDao implements Accessible<Category> {
 
     private ServletContext sc;
-    private Connection con;
+    private Connection connection;
 
     PreparedStatement ps = null;
     ResultSet rs = null;
-
+    
+    private static final String ADD_CATEGORY = "INSERT INTO categories(categoryName,memo) VALUES(?,?)";
+    private static final String DELETE_CATEGORY = "DELETE FROM categories WHERE typeId=?";
+    private static final String UPDATE_CATEGORY = "UPDATE categories "
+                                               + "SET categoryName = ?, memo = ? "
+                                               + "WHERE typeId = ?";
+    
     private static final String SELECT_CATEGORY_BY_ID = "SELECT * FROM categories WHERE typeId =?";
     private static final String SELECT_ALL_CATEGORY = "SELECT * FROM categories";
     
@@ -40,46 +46,86 @@ public class CategoryDao implements Accessible<Category> {
     public CategoryDao(){
     }
 
-    public CategoryDao(ServletContext sc) throws ClassNotFoundException, SQLException {
+    public CategoryDao(ServletContext sc){
         this.sc = sc;
-        con = getConnect(sc);
     }
     
     
     private Connection getConnect() throws ClassNotFoundException, SQLException {
-        DBContext dBContext = new DBContext();
-        Connection conn = dBContext.getConnection();
+        Connection conn;
+        if(sc == null){
+            DBContext dBContext = new DBContext();
+            conn = dBContext.getConnection();
+        }else{
+            DBContext dBContext = new DBContext(sc);
+            conn = dBContext.getConnection();
+        }
         return conn;
     }
 
-    private Connection getConnect(ServletContext sc) throws ClassNotFoundException, SQLException {
-        DBContext dBContext = new DBContext(sc);
-        Connection conn = dBContext.getConnection();
-        return conn;
+    @Override
+    public int insertRec(Category obj) throws SQLException {
+        int result = 0;
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(ADD_CATEGORY);
+            ps.setNString(1, obj.getCategoryName());
+            ps.setNString(2, obj.getMemo());
+            
+            result = ps.executeUpdate();
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        ps.close();
+        disConnect();
+        return result;
     }
 
     @Override
-    public int insertRec(Category obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int updateRec(Category obj) throws SQLException {
+        int result = 0;
+        try {
+            connection = getConnect();
+            ps = connection.prepareStatement(UPDATE_CATEGORY);
+            ps.setNString(1, obj.getCategoryName());
+            ps.setNString(2, obj.getMemo());
+            ps.setInt(3, obj.getTypeId());
+            result = ps.executeUpdate();
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        disConnect();
+        return result;
     }
 
     @Override
-    public int updateRec(Category obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int deleteRec(Category obj) throws SQLException {
+        int result = 0;
+        int typeId = obj.getTypeId();
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(DELETE_CATEGORY);
+            ps.setInt(1,typeId);
+            result = ps.executeUpdate();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        disConnect();
+        
+        return result;
     }
 
     @Override
-    public int deleteRec(Category obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Category getObjectById(String id) {
+    public Category getObjectById(String id) throws SQLException {
         int typeId = Integer.parseInt(id);
         Category category = null;
         try {
             makeConnection();
-            ps = con.prepareStatement(SELECT_CATEGORY_BY_ID);
+            ps = connection.prepareStatement(SELECT_CATEGORY_BY_ID);
             ps.setInt(1, typeId);
             
             rs = ps.executeQuery();
@@ -93,18 +139,20 @@ public class CategoryDao implements Accessible<Category> {
             }
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(CategoryDao.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
-            closeConnect();
-        }
+        } 
+        ps.close();
+        rs.close();
+        disConnect();
+        
         return category;
     }
 
     @Override
-    public List<Category> listAll() {
+    public List<Category> listAll() throws SQLException {
         List<Category> cateList = new ArrayList<>();
         try {
             makeConnection();
-            ps = con.prepareStatement(SELECT_ALL_CATEGORY);
+            ps = connection.prepareStatement(SELECT_ALL_CATEGORY);
             rs = ps.executeQuery();
             
             while (rs.next()) {
@@ -118,26 +166,24 @@ public class CategoryDao implements Accessible<Category> {
             }
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(CategoryDao.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
-            closeConnect();
         }
+        ps.close();
+        rs.close();
+        disConnect();
+        
         return cateList;
     }
     
     
     private void makeConnection() throws ClassNotFoundException, SQLException{
-        if(con == null || con.isClosed()){
-            con = getConnect();
+        if(connection == null || connection.isClosed()){
+            connection = getConnect();
         }
     }
     
-    private void closeConnect(){
-        try {
-            rs.close();
-            ps.close();
-            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+    private void disConnect() throws SQLException{
+        if(connection != null && !connection.isClosed()){
+            connection.close();
         }
     }
 

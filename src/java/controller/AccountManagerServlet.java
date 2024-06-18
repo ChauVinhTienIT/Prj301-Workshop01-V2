@@ -58,11 +58,7 @@ public class AccountManagerServlet extends HttpServlet {
                     showNewForm(request, response);
                     break;
                 case "insert":
-                    if("GET".equals(request.getMethod())){
-                        showNewForm(request, response);
-                    }else{
-                        insertAccount(request, response);
-                    }
+                    insertAccount(request, response);
                     break;
                 case "delete":
                     deleteAccount(request, response);
@@ -72,6 +68,9 @@ public class AccountManagerServlet extends HttpServlet {
                     break;
                 case "update":
                     updateAccount(request, response);
+                    break;
+                case "changeStatus":
+                    changeStatus(request, response);
                     break;
                 default:
                     listAccount(request, response);
@@ -133,11 +132,10 @@ public class AccountManagerServlet extends HttpServlet {
         Date birthDay = Date.valueOf(birthDayRaw);
         boolean gender = genderRaw.equals("1");
         int roleInSystem = Integer.parseInt(roleInSystemRaw);
-        boolean isUse = (isUseRaw == null);
+        boolean isUse = (isUseRaw != null);
 
         Account newAccount = new Account(account, pass, lastName, firstName, birthDay, gender, phone, isUse, roleInSystem);
 
-        accountDAO = new AccountDao();
         int result = accountDAO.insertRec(newAccount);
 
         response.sendRedirect("account-manager?action=list");
@@ -167,6 +165,7 @@ public class AccountManagerServlet extends HttpServlet {
     }
     
     private void updateAccount(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException{
+        request.setCharacterEncoding("UTF-8");
         String account = request.getParameter("account");
         
         String lastName = request.getParameter("lastName");
@@ -180,13 +179,21 @@ public class AccountManagerServlet extends HttpServlet {
         Date birthDay = Date.valueOf(birthDayRaw);
         boolean gender = genderRaw.equals("1");
         int roleInSystem = Integer.parseInt(roleInSystemRaw);
-        boolean isUse = (isUseRaw == null);
+        boolean isUse = (isUseRaw != null);
         
         Account updateAccount = new Account(account, "", lastName, firstName, birthDay, gender, phone, isUse, roleInSystem);
-        
+
         
         int result = accountDAO.updateRec(updateAccount);
 
+        response.sendRedirect("account-manager?action=list");
+    }
+    
+    private void changeStatus(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException{
+        String account = request.getParameter("account");
+        Account changeAccount = accountDAO.getObjectById(account);
+        changeAccount.setAccount(account);
+        int result = accountDAO.changeAccountStatus(changeAccount);
         response.sendRedirect("account-manager?action=list");
     }
 }

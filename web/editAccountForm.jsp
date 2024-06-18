@@ -10,7 +10,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add A New Account</title>
+        <title>Update Account</title>
 
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -24,6 +24,7 @@
         <%@include file = "header.jspf"%>
         <div class="container">
             <div class="row">
+                <h3>Update Account</h3>
                 <div class="col-md-8">
                     <form action="account-manager?action=update" method="POST" accept-charset="UTF-8">
 

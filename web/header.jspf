@@ -10,8 +10,8 @@
         <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="account-manager">Account Manager</a></li>
-            <li><a href="#">Product Manager</a></li>
-            <li><a href="#">Category Manager</a></li>
+            <li><a href="product-manager">Product Manager</a></li>
+            <li><a href="category-manager">Category Manager</a></li>
             
         </ul>
     </div>

@@ -4,11 +4,27 @@
         <servlet-name>AccountManagerServlet</servlet-name>
         <servlet-class>controller.AccountManagerServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CategoryManagerServlet</servlet-name>
+        <servlet-class>controller.CategoryManagerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProductManagerServlet</servlet-name>
+        <servlet-class>controller.ProductManagerServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AccountManagerServlet</servlet-name>
         <url-pattern>/account-manager</url-pattern>
     </servlet-mapping>
     
+    <servlet-mapping>
+        <servlet-name>CategoryManagerServlet</servlet-name>
+        <url-pattern>/category-manager</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductManagerServlet</servlet-name>
+        <url-pattern>/product-manager</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

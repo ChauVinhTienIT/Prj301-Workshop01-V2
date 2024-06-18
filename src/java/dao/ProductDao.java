@@ -24,11 +24,11 @@ import model.Product;
  */
 public class ProductDao implements Accessible<Product> {
 
+    private Connection connection;
     private ServletContext sc;
-    private Connection con;
 
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    private PreparedStatement ps;
+    private ResultSet rs;
 
     private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE productId =?";
     private static final String SELECT_ALL_PRODUCT = "SELECT * FROM products";
@@ -47,20 +47,19 @@ public class ProductDao implements Accessible<Product> {
     public ProductDao(){
     }
 
-    public ProductDao(ServletContext sc) throws ClassNotFoundException, SQLException {
+    public ProductDao(ServletContext sc) {
         this.sc = sc;
-        con = getConnect(sc);
     }
     
     private Connection getConnect() throws ClassNotFoundException, SQLException {
-        DBContext dBContext = new DBContext();
-        Connection conn = dBContext.getConnection();
-        return conn;
-    }
-
-    private Connection getConnect(ServletContext sc) throws ClassNotFoundException, SQLException {
-        DBContext dBContext = new DBContext(sc);
-        Connection conn = dBContext.getConnection();
+        Connection conn;
+        if(sc == null){
+            DBContext dBContext = new DBContext();
+            conn = dBContext.getConnection();
+        }else{
+            DBContext dBContext = new DBContext(sc);
+            conn = dBContext.getConnection();
+        }
         return conn;
     }
 
@@ -80,11 +79,11 @@ public class ProductDao implements Accessible<Product> {
     }
 
     @Override
-    public Product getObjectById(String id) {
+    public Product getObjectById(String id) throws SQLException {
         Product product = null;
         try {
             makeConnection();
-            ps = con.prepareStatement(SELECT_PRODUCT_BY_ID);
+            ps = connection.prepareStatement(SELECT_PRODUCT_BY_ID);
             ps.setString(1, id);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -102,21 +101,21 @@ public class ProductDao implements Accessible<Product> {
                 product = new Product(productId, productName, productImage, brief, postedDate, typeId, account, unit, price, discount);
 
             }
-        } catch (SQLException | ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(ProductDao.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
-            closeConnect();
         }
-        
+        ps.close();
+        rs.close();
+        disConnect();
         return product;
     }
 
     @Override
-    public List<Product> listAll() {
+    public List<Product> listAll() throws SQLException {
         List<Product> productList = new ArrayList<>();
         try {
             makeConnection();
-            ps = con.prepareStatement(SELECT_ALL_PRODUCT);
+            ps = connection.prepareStatement(SELECT_ALL_PRODUCT);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -135,27 +134,24 @@ public class ProductDao implements Accessible<Product> {
                 productList.add(product);
            
             }
-        } catch (SQLException | ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
-            closeConnect();
         }
+        ps.close();
+        rs.close();
+        disConnect();
         return productList;
     }
     
     private void makeConnection() throws ClassNotFoundException, SQLException{
-        if(con == null || con.isClosed()){
-            con = getConnect();
+        if(connection == null || connection.isClosed()){
+            connection = getConnect();
         }
     }
     
-    private void closeConnect(){
-        try {
-            rs.close();
-            ps.close();
-            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+    private void disConnect() throws SQLException{
+        if(connection != null && !connection.isClosed()){
+            connection.close();
         }
     }
 }
