@@ -25,7 +25,7 @@
         <%@include file = "header.jspf"%>
         <div class="container">
             <h2>Product List</h2>
-            <a href="product-manager?action=new">Add New Account</a>
+            <a href="product-manager?action=new">Add New Product</a>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -56,11 +56,9 @@
                                 <td>${product.getPrice()}</td>
                                 <td>${product.getDiscount()}</td>
                                 <td>
-                                    <a href="account-manager?action=edit&account=<c:out value='${account.getAccount()}' />">Edit</a> 
+                                    <a href="product-manager?action=edit&productId=<c:out value='${product.getProductId()}' />">Edit</a> 
                                     &nbsp;&nbsp;&nbsp;&nbsp; 
-                                    <a href="account-manager?action=delete&account=<c:out value='${account.getAccount()}'/>">Delete</a>
-                                    &nbsp;&nbsp;&nbsp;&nbsp; 
-                                    <a href="account-manager?action=changeStatus&account=<c:out value='${account.getAccount()}' />">${account.isIsUse()?"Deactivate":"Activate"}</a>
+                                    <a href="product-manager?action=delete&productId=<c:out value='${product.getProductId()}'/>">Delete</a>
                                 </td>
                             </tr>
                         </c:forEach>

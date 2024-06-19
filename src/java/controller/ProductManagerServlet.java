@@ -8,7 +8,9 @@ package controller;
 import dao.ProductDao;
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.Account;
 import model.Product;
 
 /**
@@ -51,13 +54,13 @@ public class ProductManagerServlet extends HttpServlet {
         try {
             switch (action) {
                 case "new":
-                    //showNewForm(request, response);
+                    showNewForm(request, response);
                     break;
                 case "insert":
-                    //insertAccount(request, response);
+                    insertProduct(request, response);
                     break;
                 case "delete":
-                    //deleteAccount(request, response);
+                    deleteProduct(request, response);
                     break;
                 case "edit":
                     //showEditForm(request, response);
@@ -123,4 +126,64 @@ public class ProductManagerServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+    private void deleteProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+        String productId = request.getParameter("productId");
+        System.out.println(productId);
+        Product toDelete = new Product();
+        toDelete.setProductId(productId);
+        int result = productDao.deleteRec(toDelete);
+        response.sendRedirect("product-manager?action=list");
+    }
+    
+    private void insertProduct(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException{
+        request.setCharacterEncoding("UTF-8");
+        
+        
+        String productId = request.getParameter("productId");
+        String productName = request.getParameter("productName");
+        String brief = request.getParameter("brief");
+        String typeIdRaw = request.getParameter("typeId");
+        String unitRaw = request.getParameter("unit");
+        
+        String priceRaw = request.getParameter("price");
+        String discountRaw = request.getParameter("discount");
+        
+        int typeId = Integer.parseInt(typeIdRaw);
+        int price = Integer.parseInt(priceRaw);
+        int discount = Integer.parseInt(discountRaw);
+        
+        Account currentUser = new Account();
+        currentUser.setAccount("admin");
+        Date postedDateRaw = new Date();
+        java.sql.Date postedDate = new java.sql.Date(postedDateRaw.getTime());
+        
+        //String productImage = ;
+        //Date postedDate;
+        
+        String unit = "";
+        switch (unitRaw){
+            case "1":
+                unit = "Cái";
+                break;
+            case "2":
+                unit = "Chiếc";
+                break;
+            case "3":
+                unit = "Bộ";
+                break;
+        }
+        
+        Product newProduct = new Product(productId, productName, "/notYet", brief, postedDate, typeId, currentUser.getAccount(), unit, price, discount);
+
+        int result = productDao.insertRec(newProduct);
+
+        response.sendRedirect("product-manager?action=list");
+    }
+
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("insertProductForm.jsp");
+        dispatcher.forward(request, response);
+    }
+    
+    
 }

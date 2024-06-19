@@ -32,7 +32,10 @@ public class ProductDao implements Accessible<Product> {
 
     private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE productId =?";
     private static final String SELECT_ALL_PRODUCT = "SELECT * FROM products";
-
+    private static final String DELETE_PRODUCT = "DELETE FROM products WHERE productId=?";
+    private static final String ADD_PRODUCT = "INSERT INTO products VALUES(?,?,?,?,?,?,?,?,?,?)";
+    
+    
     private static final String PRODUCT_ID = "productId";
     private static final String PRODUCT_NAME = "productName";
     private static final String PRODUCT_IMAGE = "productImage";
@@ -64,8 +67,30 @@ public class ProductDao implements Accessible<Product> {
     }
 
     @Override
-    public int insertRec(Product obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int insertRec(Product obj) throws SQLException {
+        int result = 0;
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(ADD_PRODUCT);
+            ps.setString(1, obj.getProductId());
+            ps.setNString(2, obj.getProductName());
+            ps.setString(3, obj.getProductImage());
+            ps.setString(4, obj.getBrief());
+            ps.setDate(5, obj.getPostedDate());
+            ps.setInt(6, obj.getTypeId());
+            ps.setString(7, obj.getAccount());
+            ps.setNString(8, obj.getUnit());
+            ps.setInt(9, obj.getPrice());
+            ps.setInt(10, obj.getDiscount());
+            
+            result = ps.executeUpdate();
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        ps.close();
+        disConnect();
+        return result;
     }
 
     @Override
@@ -74,8 +99,21 @@ public class ProductDao implements Accessible<Product> {
     }
 
     @Override
-    public int deleteRec(Product obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int deleteRec(Product obj) throws SQLException {
+        int result = 0;
+        String productId = obj.getProductId();
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(DELETE_PRODUCT);
+            ps.setString(1,productId);
+            result = ps.executeUpdate();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        disConnect();
+        
+        return result;
     }
 
     @Override

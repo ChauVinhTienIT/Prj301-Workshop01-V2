@@ -106,8 +106,8 @@ public class AccountDao implements Accessible<Account> {
         try {
             connection = getConnect();
             ps = connection.prepareStatement(UPDATE_ACCOUNT);
-            ps.setString(1, obj.getLastName());
-            ps.setString(2, obj.getFirstName());
+            ps.setNString(1, obj.getLastName());
+            ps.setNString(2, obj.getFirstName());
             ps.setDate(3, obj.getBirthDay());
             ps.setBoolean(4, obj.isGender());
             ps.setString(5, obj.getPhone());

@@ -38,9 +38,19 @@
                                 <td>${category.getCategoryName()}</td>
                                 <td>${category.getMemo()}</td>
                                 <td>
-                                    <a href="category-manager?action=edit&typeId=<c:out value='${category.getTypeId()}' />">Edit</a> 
+                                    
+
+                                    <c:url value = "category-manager" var = "editUrl">
+                                        <c:param name = "action" value = "edit"/>
+                                        <c:param name = "typeId" value = "${category.getTypeId()}"/>
+                                    </c:url>
+                                    <c:url value = "category-manager" var = "deleteUrl">
+                                        <c:param name = "action" value = "delete"/>
+                                        <c:param name = "typeId" value = "${category.getTypeId()}"/>
+                                    </c:url>
+                                    <a href="${editUrl}">Edit</a> 
                                     &nbsp;&nbsp;&nbsp;&nbsp; 
-                                    <a href="category-manager?action=delete&typeId=<c:out value='${category.getTypeId()}'/>">Delete</a>
+                                    <a href="${deleteUrl}">Delete</a>
                                 </td>
                             </tr>
                         </c:forEach>
