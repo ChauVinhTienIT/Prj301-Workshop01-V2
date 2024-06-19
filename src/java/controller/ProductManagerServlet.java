@@ -7,7 +7,8 @@ package controller;
 
 import dao.ProductDao;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -16,9 +17,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import model.Account;
 import model.Product;
 
@@ -26,9 +29,17 @@ import model.Product;
  *
  * @author Lenovo
  */
+
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, //2MB
+        maxFileSize = 1024 * 1024 * 10, //10MB
+        maxRequestSize = 1024 * 1024 * 50 //50MB
+)
+
 public class ProductManagerServlet extends HttpServlet {
     
     private ProductDao productDao;
+    private static final String SAVE_DIRECTORY = "images/sanPham";
 
     @Override
     public void init() {
@@ -63,10 +74,10 @@ public class ProductManagerServlet extends HttpServlet {
                     deleteProduct(request, response);
                     break;
                 case "edit":
-                    //showEditForm(request, response);
+                    showEditForm(request, response);
                     break;
                 case "update":
-                    //updateAccount(request, response);
+                    updateProduct(request, response);
                     break;
                 case "changeStatus":
                     //changeStatus(request, response);
@@ -128,7 +139,6 @@ public class ProductManagerServlet extends HttpServlet {
 
     private void deleteProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         String productId = request.getParameter("productId");
-        System.out.println(productId);
         Product toDelete = new Product();
         toDelete.setProductId(productId);
         int result = productDao.deleteRec(toDelete);
@@ -157,7 +167,7 @@ public class ProductManagerServlet extends HttpServlet {
         Date postedDateRaw = new Date();
         java.sql.Date postedDate = new java.sql.Date(postedDateRaw.getTime());
         
-        //String productImage = ;
+        String productImage = uploadImage(request, response);
         //Date postedDate;
         
         String unit = "";
@@ -173,7 +183,7 @@ public class ProductManagerServlet extends HttpServlet {
                 break;
         }
         
-        Product newProduct = new Product(productId, productName, "/notYet", brief, postedDate, typeId, currentUser.getAccount(), unit, price, discount);
+        Product newProduct = new Product(productId, productName, productImage, brief, postedDate, typeId, currentUser.getAccount(), unit, price, discount);
 
         int result = productDao.insertRec(newProduct);
 
@@ -185,5 +195,78 @@ public class ProductManagerServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
     
-    
+    private String uploadImage(HttpServletRequest request, HttpServletResponse response){
+        String fileName = "";
+        String realPart = "";
+        String fileDir = "";
+        try {
+            
+            Part part = request.getPart("image");
+            realPart = request.getServletContext().getRealPath(SAVE_DIRECTORY);
+            fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+
+            if (!Files.exists(Paths.get(realPart))) {
+                Files.createDirectory(Paths.get(realPart));
+            }
+            part.write(realPart + "/" + fileName);
+        } catch (Exception ex){
+            
+        }
+        fileDir = String.format("/%s/%s", SAVE_DIRECTORY, fileName);
+        System.out.println(fileDir);
+        return fileDir;
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        String account = request.getParameter("productId");
+        Product existProduct = productDao.getObjectById(account);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("editProductForm.jsp");
+        request.setAttribute("existProduct", existProduct);
+        dispatcher.forward(request, response);
+    }
+
+    private void updateProduct(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+        request.setCharacterEncoding("UTF-8");
+        String productId = request.getParameter("productId");
+        String productName = request.getParameter("productName");
+        String brief = request.getParameter("brief");
+        String typeIdRaw = request.getParameter("typeId");
+        String unitRaw = request.getParameter("unit");
+        
+        String priceRaw = request.getParameter("price");
+        String discountRaw = request.getParameter("discount");
+        
+        int typeId = Integer.parseInt(typeIdRaw);
+        int price = Integer.parseInt(priceRaw);
+        int discount = Integer.parseInt(discountRaw);
+        
+        Account currentUser = new Account();
+        currentUser.setAccount("admin");
+        Date postedDateRaw = new Date();
+        java.sql.Date postedDate = new java.sql.Date(postedDateRaw.getTime());
+        
+        String productImage = uploadImage(request, response);
+        if(productImage.equals(String.format("/%s/",SAVE_DIRECTORY))){
+            productImage = productDao.getObjectById(productId).getProductImage();
+        }
+        
+        String unit = "";
+        switch (unitRaw){
+            case "1":
+                unit = "Cái";
+                break;
+            case "2":
+                unit = "Chiếc";
+                break;
+            case "3":
+                unit = "Bộ";
+                break;
+        }
+        
+        Product newProduct = new Product(productId, productName, productImage, brief, postedDate, typeId, currentUser.getAccount(), unit, price, discount);
+        
+        int result = productDao.updateRec(newProduct);
+
+        response.sendRedirect("product-manager?action=list");
+    }
 }

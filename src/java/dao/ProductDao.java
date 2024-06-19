@@ -34,7 +34,9 @@ public class ProductDao implements Accessible<Product> {
     private static final String SELECT_ALL_PRODUCT = "SELECT * FROM products";
     private static final String DELETE_PRODUCT = "DELETE FROM products WHERE productId=?";
     private static final String ADD_PRODUCT = "INSERT INTO products VALUES(?,?,?,?,?,?,?,?,?,?)";
-    
+    private static final String UPDATE_PRODUCT = "UPDATE products "
+                                               + "SET productName = ?, productImage = ?, brief = ?, postedDate = ?, typeId = ?, unit = ?, price = ?, discount = ? "
+                                               + "WHERE productId = ?";
     
     private static final String PRODUCT_ID = "productId";
     private static final String PRODUCT_NAME = "productName";
@@ -94,8 +96,29 @@ public class ProductDao implements Accessible<Product> {
     }
 
     @Override
-    public int updateRec(Product obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int updateRec(Product obj) throws SQLException {
+        int result = 0;
+        try {
+            
+            connection = getConnect();
+            ps = connection.prepareStatement(UPDATE_PRODUCT);
+            ps.setNString(1, obj.getProductName());
+            ps.setString(2, obj.getProductImage());
+            ps.setNString(3, obj.getBrief());
+            ps.setDate(4, obj.getPostedDate());
+            ps.setInt(5, obj.getTypeId());
+            ps.setString(6, obj.getUnit());
+            ps.setInt(7, obj.getPrice());
+            ps.setInt(8, obj.getDiscount());
+            ps.setString(9, obj.getProductId());
+            result = ps.executeUpdate();
+      
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        disConnect();
+        return result;
     }
 
     @Override

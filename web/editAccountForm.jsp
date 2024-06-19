@@ -38,21 +38,21 @@
                         </div>
                         <div class="form-group">
                             <label for="lastName">Last Name:</label>
-                            <input type="text" class="form-control" name="lastName" value="<c:out value='${existAccount.getLastName()}' />">
+                            <input type="text" class="form-control" name="lastName" value="${existAccount.getLastName()}">
                         </div>
                         <div class="form-group">
                             <label for="firstName">First Name:</label>
-                            <input type="text" class="form-control" name="firstName" value="<c:out value='${existAccount.getFirstName()}' />">
+                            <input type="text" class="form-control" name="firstName" value="${existAccount.getFirstName()}">
                         </div>
 
                         <div class="form-group">
                             <label for="phone">Phone Number:</label>
-                            <input type="text" class="form-control" name="phone" value="<c:out value='${existAccount.getPhone()}' />">
+                            <input type="text" class="form-control" name="phone" value="${existAccount.getPhone()}">
                         </div>
 
                         <div class="form-group">
                             <label for="birthDay">Birth Day:</label>
-                            <input type="date" class="form-control" name="birthDay" value="<c:out value='${existAccount.getBirthDay()}' />">
+                            <input type="date" class="form-control" name="birthDay" value="${existAccount.getBirthDay()}">
                         </div>
 
                         <div class="form-group">

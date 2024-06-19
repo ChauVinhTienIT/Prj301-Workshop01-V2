@@ -29,7 +29,7 @@ import javax.servlet.http.Part;
 )
 public class UploadMultiServlet extends HttpServlet {
 
-    public static final String SAVE_DIRECTORY = "images/TestSanPham";
+    private static final String SAVE_DIRECTORY = "images/sanPham";
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
