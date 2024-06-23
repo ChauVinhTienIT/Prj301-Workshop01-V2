@@ -30,8 +30,12 @@ public class ProductDao implements Accessible<Product> {
     private PreparedStatement ps;
     private ResultSet rs;
 
-    private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE productId =?";
+    private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE productId = ?";
     private static final String SELECT_ALL_PRODUCT = "SELECT * FROM products";
+    private static final String SELECT_NEW_PRODUCT = "SELECT * FROM products ORDER BY postedDate";
+    
+    private static final String SELECT_PRODUCT_BY_CATE = "SELECT * FROM products WHERE typeId = ?";
+    
     private static final String DELETE_PRODUCT = "DELETE FROM products WHERE productId=?";
     private static final String ADD_PRODUCT = "INSERT INTO products VALUES(?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_PRODUCT = "UPDATE products "
@@ -203,6 +207,72 @@ public class ProductDao implements Accessible<Product> {
         disConnect();
         return productList;
     }
+    
+    public List<Product> listNewProducts() throws SQLException {
+        List<Product> productList = new ArrayList<>();
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(SELECT_NEW_PRODUCT);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String productId = rs.getString(PRODUCT_ID);
+                String productName = rs.getNString(PRODUCT_NAME);
+                String productImage = rs.getString(PRODUCT_IMAGE);
+                String brief = rs.getNString(BRIEF);
+                Date postedDate = rs.getDate(POSTED_DATE);
+                int typeId = rs.getInt(TYPE_ID);
+                String account = rs.getString(ACCOUNT);
+                String unit = rs.getNString(UNIT);
+                int price = rs.getInt(PRICE);
+                int discount = rs.getInt(DISCOUNT);
+                
+                Product product = new Product(productId, productName, productImage, brief, postedDate, typeId, account, unit, price, discount);
+                productList.add(product);
+           
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        rs.close();
+        disConnect();
+        return productList;
+    }
+    
+    public List<Product> listProductsByCategory(int categoryId) throws SQLException {
+        List<Product> productList = new ArrayList<>();
+        try {
+            makeConnection();
+            ps = connection.prepareStatement(SELECT_PRODUCT_BY_CATE);
+            ps.setInt(1,categoryId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String productId = rs.getString(PRODUCT_ID);
+                String productName = rs.getNString(PRODUCT_NAME);
+                String productImage = rs.getString(PRODUCT_IMAGE);
+                String brief = rs.getNString(BRIEF);
+                Date postedDate = rs.getDate(POSTED_DATE);
+                int typeId = rs.getInt(TYPE_ID);
+                String account = rs.getString(ACCOUNT);
+                String unit = rs.getNString(UNIT);
+                int price = rs.getInt(PRICE);
+                int discount = rs.getInt(DISCOUNT);
+                
+                Product product = new Product(productId, productName, productImage, brief, postedDate, typeId, account, unit, price, discount);
+                productList.add(product);
+           
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AccountDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ps.close();
+        rs.close();
+        disConnect();
+        return productList;
+    }
+   
     
     private void makeConnection() throws ClassNotFoundException, SQLException{
         if(connection == null || connection.isClosed()){

@@ -5,6 +5,7 @@
  */
 package controller;
 
+import context.JWAView;
 import dao.CategoryDao;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -115,7 +116,7 @@ public class CategoryManagerServlet extends HttpServlet {
     }// </editor-fold>
     
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("insertCategoryForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.INSERT_CATEGORY_JSP);
         dispatcher.forward(request, response);
     }
     
@@ -136,7 +137,7 @@ public class CategoryManagerServlet extends HttpServlet {
     private void listCategory(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
         List<Category> categoryList = categoryDao.listAll();
         request.setAttribute("categoryList", categoryList);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("categoryList.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.CATEGORY_LIST_JSP);
         dispatcher.forward(request, response);
     }
 
@@ -154,7 +155,7 @@ public class CategoryManagerServlet extends HttpServlet {
         String typeId = request.getParameter("typeId");
         Category existCategory = categoryDao.getObjectById(typeId);
         
-        RequestDispatcher dispatcher = request.getRequestDispatcher("editCategoryForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.EDIT_CATEGORY_JSP);
         request.setAttribute("existCategory", existCategory);
         
         dispatcher.forward(request, response);

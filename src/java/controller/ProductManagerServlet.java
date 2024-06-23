@@ -5,6 +5,7 @@
  */
 package controller;
 
+import context.JWAView;
 import dao.ProductDao;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -79,9 +80,6 @@ public class ProductManagerServlet extends HttpServlet {
                 case "update":
                     updateProduct(request, response);
                     break;
-                case "changeStatus":
-                    //changeStatus(request, response);
-                    break;
                 default:
                     listProduct(request, response);
                     break;
@@ -133,7 +131,7 @@ public class ProductManagerServlet extends HttpServlet {
     private void listProduct(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         List<Product> productList = productDao.listAll();
         request.setAttribute("productList", productList);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("productList.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.PRODUCT_LIST_JSP);
         dispatcher.forward(request, response);
     }
 
@@ -191,7 +189,7 @@ public class ProductManagerServlet extends HttpServlet {
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("insertProductForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.INSERT_PRODUCT_JSP);
         dispatcher.forward(request, response);
     }
     
@@ -220,7 +218,7 @@ public class ProductManagerServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         String account = request.getParameter("productId");
         Product existProduct = productDao.getObjectById(account);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("editProductForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.EDIT_PRODUCT_JSP);
         request.setAttribute("existProduct", existProduct);
         dispatcher.forward(request, response);
     }

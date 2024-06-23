@@ -118,6 +118,16 @@ public class Product {
     public void setDiscount(int discount) {
         this.discount = discount;
     }
+    
+    public int getPriceAfterDiscount(){
+        double result = this.price;
+        int price = (int)result;
+        if(this.discount > 0){
+            result = this.price - (this.price * this.discount * 0.001);
+            price = (int)result;
+        }
+        return price;
+    }
 
     @Override
     public String toString() {

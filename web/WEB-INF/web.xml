@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <filter>
+        <filter-name>AdminAuthenticatorFilter</filter-name>
+        <filter-class>filter.AdminAuthenticatorFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AdminAuthenticatorFilter</filter-name>
+        <url-pattern>/account-manager/*</url-pattern>
+    </filter-mapping>
+    
     <servlet>
         <servlet-name>AccountManagerServlet</servlet-name>
         <servlet-class>controller.AccountManagerServlet</servlet-class>
@@ -12,11 +21,20 @@
         <servlet-name>ProductManagerServlet</servlet-name>
         <servlet-class>controller.ProductManagerServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserAuthenticationServlet</servlet-name>
+        <servlet-class>controller.UserAuthenticationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HomePageController</servlet-name>
+        <servlet-class>controller.HomePageController</servlet-class>
+    </servlet>
+    
+    
     <servlet-mapping>
         <servlet-name>AccountManagerServlet</servlet-name>
         <url-pattern>/account-manager</url-pattern>
     </servlet-mapping>
-    
     <servlet-mapping>
         <servlet-name>CategoryManagerServlet</servlet-name>
         <url-pattern>/category-manager</url-pattern>
@@ -25,6 +43,15 @@
         <servlet-name>ProductManagerServlet</servlet-name>
         <url-pattern>/product-manager</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserAuthenticationServlet</servlet-name>
+        <url-pattern>/user-authentication</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HomePageController</servlet-name>
+        <url-pattern>/home-page</url-pattern>
+    </servlet-mapping>
+    
     <session-config>
         <session-timeout>
             30

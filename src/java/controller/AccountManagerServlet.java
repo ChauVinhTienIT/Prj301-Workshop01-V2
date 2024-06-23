@@ -5,6 +5,7 @@
  */
 package controller;
 
+import context.JWAView;
 import dao.AccountDao;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -112,7 +113,7 @@ public class AccountManagerServlet extends HttpServlet {
 
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("insertAccountForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.INSERT_ACCOUNT_JSP);
         dispatcher.forward(request, response);
     }
 
@@ -144,7 +145,7 @@ public class AccountManagerServlet extends HttpServlet {
     private void listAccount(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, SQLException {
         List<Account> accList = accountDAO.listAll();
         request.setAttribute("accList", accList);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("accountList.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.ACCOUNT_LIST_JSP);
         dispatcher.forward(request, response);
     }
     
@@ -159,7 +160,7 @@ public class AccountManagerServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException{
         String account = request.getParameter("account");
         Account existAccount = accountDAO.getObjectById(account);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("editAccountForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(JWAView.EDIT_ACCOUNT_JSP);
         request.setAttribute("existAccount", existAccount);
         dispatcher.forward(request, response);
     }
